@@ -10,7 +10,7 @@ def run():
                       where date_rate=date_date and target=target_currency;''').fetchall()
 
     for i in data:
-        print("At th date of {}, the {} {} equal to {} {}".format(*i))
+        print("At the date of {}, the {} {} equal to {} {}".format(*i))
 
 if __name__ == '__main__':
     run()
