@@ -1,7 +1,6 @@
 import httplib2
 import json
 from data_setup import db
-import psycopg2
 
 
 def getExchangeData():
