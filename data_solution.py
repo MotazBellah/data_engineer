@@ -9,9 +9,9 @@ def run():
                       SELECT CAST('2019-08-29' AS DATE) AS date_date, CAST('RUB' AS CHAR(3)) AS target_currency,
                       CAST('333.33' AS NUMERIC(14,4)) AS a_price) as target_data
                       where date_rate=date_date and target=target_currency;''').fetchall()
-
-    for i in data:
-        output += "At the date of {}, the {} {} equal to {} {} \n".format(*i)
+    if data:
+        for i in data:
+            output += "At the date of {}, the {} {} equal to {} {} \n".format(*i)
 
     return output
 
