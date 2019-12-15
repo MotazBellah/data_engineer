@@ -1,19 +1,25 @@
 from data_setup import db
 
-def run(target_data):
+def run(target_data, source=''):
+    if source not in ['USD', 'EUR']:
+        source = 'USD', 'EUR'
+    else:
+        source = (source,'')
     output = ''
     if target_data:
-        data = db.execute('''select date_rate, a_price, target,((1/value)*a_price) as output_value, source from rates,
+        data = db.execute('''select date_rate, a_price, target,CAST(((1/value)*a_price) AS NUMERIC(16,5))as output_value, source from rates,
                           ({}) as target_data
-                          where date_rate=date_date and target=target_currency;'''.format(target_data)).fetchall()
+                          where date_rate=date_date and target=target_currency and source in {};'''.format(target_data, source)).fetchall()
     else:
         return output
-        
+
     if data:
         for i in data:
             output += "At the date of {}, the {} {} equal to {} {} \n".format(*i)
+    else:
+        output += "Please check the date or the target currency!"
 
-    return output
+    return output.strip()
 
 if __name__ == '__main__':
     print(run('''SELECT CAST('2019-01-10' AS DATE) AS date_date, CAST('EUR' AS CHAR(3)) AS target_currency,
@@ -21,3 +27,9 @@ if __name__ == '__main__':
               CAST('GBP' AS CHAR(3)) AS target_currency, CAST('12.12' AS NUMERIC(14,4)) AS a_price UNION
               SELECT CAST('2019-08-29' AS DATE) AS date_date, CAST('RUB' AS CHAR(3)) AS target_currency,
               CAST('333.33' AS NUMERIC(14,4)) AS a_price'''))
+
+    # print(run('''SELECT CAST('2022-08-09' AS DATE) AS date_date, CAST('CAD' AS CHAR(3)) AS target_currency,
+    #         CAST('675.34' AS NUMERIC(14,4)) AS a_price UNION SELECT CAST('2000-03-13' AS DATE) AS date_date,
+    #         CAST('GBP' AS CHAR(3)) AS target_currency, CAST('52' AS NUMERIC(14,4)) AS a_price UNION
+    #         SELECT CAST('1800-06-11' AS DATE) AS date_date, CAST('RUB' AS CHAR(3)) AS target_currency,
+    #         CAST('3.5' AS NUMERIC(14,4)) AS a_price'''))
