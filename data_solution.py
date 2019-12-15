@@ -1,24 +1,36 @@
 from data_setup import db
 
 def run(target_data, source=''):
+    '''Function to get multiple target currency and
+    convert them to USD value or EUR value
+    Input: target_data(string), represent a SQL query
+    that conatains multiple source (target) prices,
+    and source(string), represent which base currencies (USD, EUR) you want to Convert
+    the default value is empty i.e convert to both USD and test_run_EUR
+    Output: String value that conatins the conveted currencies'''
+
+    output = ''
+    # If source empty(default) or the user enter a wrong value,
+    # Then set the source to be equal to USD and EUR
+    # otherwise save the source in tuple, to be easy reachable in SQL query
     if source not in ['USD', 'EUR']:
         source = 'USD', 'EUR'
     else:
         source = (source,'')
-    output = ''
+
     if target_data:
         data = db.execute('''select date_rate, a_price, target,CAST(((1/value)*a_price) AS NUMERIC(16,5))as output_value, source from rates,
                           ({}) as target_data
                           where date_rate=date_date and target=target_currency and source in {};'''.format(target_data, source)).fetchall()
-    else:
-        return output
-
+    # If data has some output, loop through it
+    # and append it to the sting value to return it
     if data:
         for i in data:
             output += "At the date of {}, the {} {} equal to {} {} \n".format(*i)
     else:
         output += "Please check the date or the target currency!"
 
+    # Delete the not need spaces, i.e the last line using strip function
     return output.strip()
 
 if __name__ == '__main__':
