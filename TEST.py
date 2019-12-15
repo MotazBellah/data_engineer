@@ -32,7 +32,7 @@ class TestRun(unittest.TestCase):
 
     def test_run_DATE(self):
         '''Test the response a gainst incorrect date (future or past)'''
-        
+
         input = '''SELECT CAST('2022-08-09' AS DATE) AS date_date, CAST('CAD' AS CHAR(3)) AS target_currency,
                 CAST('675.34' AS NUMERIC(14,4)) AS a_price UNION SELECT CAST('2000-03-13' AS DATE) AS date_date,
                 CAST('GBP' AS CHAR(3)) AS target_currency, CAST('52' AS NUMERIC(14,4)) AS a_price UNION
@@ -40,7 +40,17 @@ class TestRun(unittest.TestCase):
                 CAST('3.5' AS NUMERIC(14,4)) AS a_price'''
         response = run(input)
 
-        excepected_output = '''Please check the date or the target currency!'''
+        excepected_output = '''Please check you target data!'''
+        self.assertEqual(response, excepected_output)
+
+
+    def test_run_target_DATA(self):
+        '''Test the response a gainst wrong target_data i.e wrong SQL query'''
+
+        input = "SELECT CAST('2019-01-10' AS DATE) AS date_date, CAST('EUR' AS CHAR(3)) AS target_currency"
+        response = run(input)
+
+        excepected_output = '''Target data should has a date, target currency and price, Please check your data!'''
         self.assertEqual(response, excepected_output)
 
 

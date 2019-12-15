@@ -9,7 +9,7 @@ def run(target_data, source=''):
     the default value is empty i.e convert to both USD and test_run_EUR
     Output: String value that conatins the conveted currencies'''
 
-    output = ''
+    output, data = '', ''
     # If source empty(default) or the user enter a wrong value,
     # Then set the source to be equal to USD and EUR
     # otherwise save the source in tuple, to be easy reachable in SQL query
@@ -18,17 +18,23 @@ def run(target_data, source=''):
     else:
         source = (source,'')
 
-    if target_data:
+    # Check if the user has entered a corrected data
+    try:
         data = db.execute('''select date_rate, a_price, target,CAST(((1/value)*a_price) AS NUMERIC(16,5))as output_value, source from rates,
                           ({}) as target_data
                           where date_rate=date_date and target=target_currency and source in {};'''.format(target_data, source)).fetchall()
+    except Exception as e:
+        # pass
+        # print(e)
+        return 'Target data should has a date, target currency and price, Please check your data!'
+
     # If data has some output, loop through it
     # and append it to the sting value to return it
     if data:
         for i in data:
             output += "At the date of {}, the {} {} equal to {} {} \n".format(*i)
     else:
-        output += "Please check the date or the target currency!"
+        output += "Please check you target data!"
 
     # Delete the not need spaces, i.e the last line using strip function
     return output.strip()
@@ -40,8 +46,4 @@ if __name__ == '__main__':
               SELECT CAST('2019-08-29' AS DATE) AS date_date, CAST('RUB' AS CHAR(3)) AS target_currency,
               CAST('333.33' AS NUMERIC(14,4)) AS a_price'''))
 
-    # print(run('''SELECT CAST('2022-08-09' AS DATE) AS date_date, CAST('CAD' AS CHAR(3)) AS target_currency,
-    #         CAST('675.34' AS NUMERIC(14,4)) AS a_price UNION SELECT CAST('2000-03-13' AS DATE) AS date_date,
-    #         CAST('GBP' AS CHAR(3)) AS target_currency, CAST('52' AS NUMERIC(14,4)) AS a_price UNION
-    #         SELECT CAST('1800-06-11' AS DATE) AS date_date, CAST('RUB' AS CHAR(3)) AS target_currency,
-    #         CAST('3.5' AS NUMERIC(14,4)) AS a_price'''))
+    print(run(""))
